@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using asp_bpm_core7_BE.Dtos;
 using asp_bpm_core7_BE.Models;
 using asp_bpm_core7_BE.Services.OwnerService;
@@ -30,6 +31,20 @@ public class OwnerApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> GetOwnersById(int id)
     {
         return Ok(await _ownerRepository.GetOwner(id));
+    }
+
+    [HttpGet("OwnerUser")]
+    public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> GetOwner()
+    {
+        var response = new ServiceResponse<GetOwnerDto>();
+        if (User.IsInRole(Helpers.OwnerRole))
+        {
+            var getUserId = User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.NameIdentifier)!.Value;
+            int userId = Int32.Parse(getUserId);
+            return Ok(await _ownerRepository.GetOwner(userId));
+        }
+        return response;
+
     }
 
     [HttpPost("RegisterOwner")]

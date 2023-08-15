@@ -17,4 +17,5 @@ public interface IOwnerRepository
 
     Task<ServiceResponse<AuthOwnerResponse>> LoginOwner(string email, string password);
 
+
 }
