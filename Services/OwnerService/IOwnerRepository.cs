@@ -5,7 +5,7 @@ namespace asp_bpm_core7_BE.Services.OwnerService;
 
 public interface IOwnerRepository
 {
-    Task<ServiceResponse<List<GetOwnerDto>>> GetAllOwners();
+    Task<ServiceResponse<List<GetOwnerDto>>> GetAllOwners(int? roleId);
     Task<ServiceResponse<GetOwnerDto>> GetOwner(int id);
     Task<bool> OwnerExists(string email);
     Task<bool> OwnerExistsById(int id);
@@ -16,6 +16,11 @@ public interface IOwnerRepository
     Task<ServiceResponse<GetOwnerDto>> UpdateOwner(UpdateOwnerDto owner, string password);
 
     Task<ServiceResponse<AuthOwnerResponse>> LoginOwner(string email, string password);
+
+    Task<ServiceResponse<List<GetRoleDto>>> GetRoles();
+
+    Task<ServiceResponse<string>> GenerateLoginVerification(string email);
+    Task<ServiceResponse<VerifySecretKeyDto>> FromEmailLoginVerification(string secretKey);
 
 
 }

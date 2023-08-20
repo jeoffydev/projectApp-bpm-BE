@@ -21,10 +21,10 @@ public class OwnerApiController : ControllerBase
 
     }
 
-    [HttpGet("Owners")]
-    public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> GetOwners()
+    [HttpGet("Owners/{roleId?}")]
+    public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> GetOwners(int? roleId)
     {
-        return Ok(await _ownerRepository.GetAllOwners());
+        return Ok(await _ownerRepository.GetAllOwners(roleId));
     }
 
     [HttpGet("Owner/{id}")]
@@ -98,4 +98,34 @@ public class OwnerApiController : ControllerBase
         }
         return Ok(response);
     }
+
+    [HttpGet("Roles")]
+    public async Task<ActionResult<ServiceResponse<List<GetRoleDto>>>> GetRoles()
+    {
+        return Ok(await _ownerRepository.GetRoles());
+    }
+
+
+    [AllowAnonymous]
+    [HttpPost("CheckLoginEmail")]
+    public async Task<ActionResult<ServiceResponse<string>>> CheckLoginEmail(EmailVerificationDto emailDto)
+    {
+        var response = new ServiceResponse<string>();
+        var verify = await _ownerRepository.OwnerExists(emailDto.Email);
+        if (!verify)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+        return Ok(await _ownerRepository.GenerateLoginVerification(emailDto.Email));
+    }
+
+    [AllowAnonymous]
+    [HttpGet("FinalizedLogin/{secret}")]
+    public async Task<ActionResult<ServiceResponse<VerifySecretKeyDto>>> FinalizedLogin(string secret)
+    {
+        return Ok(await _ownerRepository.FromEmailLoginVerification(secret));
+    }
+
+
 }

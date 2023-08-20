@@ -24,10 +24,21 @@ public class OwnerRepository : IOwnerRepository
         _mapper = mapper;
         _configuration = configuration;
     }
-    public async Task<ServiceResponse<List<GetOwnerDto>>> GetAllOwners()
+
+    private IQueryable<Owner> FilterUserOrderByClause(int? roleId)
+    {
+        var WhereRole = roleId is not null ? _context.Owners.Include(a => a.AuthRole)
+        .Where(
+                    u => u.AuthRoleId == roleId
+            ) : _context.Owners.Include(a => a.AuthRole);
+
+        return WhereRole.OrderBy((e) => e.FullName);
+    }
+    public async Task<ServiceResponse<List<GetOwnerDto>>> GetAllOwners(int? roleId)
     {
         var ServiceResponse = new ServiceResponse<List<GetOwnerDto>>();
-        var dbOwners = await _context.Owners.Include(a => a.AuthRole).ToListAsync();
+        var dbOwners = await FilterUserOrderByClause(roleId)
+               .AsNoTracking().ToListAsync();
 
         var ownerDtos = new List<GetOwnerDto>();
 
@@ -248,5 +259,69 @@ public class OwnerRepository : IOwnerRepository
         SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
 
         return tokenHandler.WriteToken(token);
+    }
+
+    public async Task<ServiceResponse<List<GetRoleDto>>> GetRoles()
+    {
+        var response = new ServiceResponse<List<GetRoleDto>>();
+        var results = await _context.AuthRoles.ToListAsync();
+
+        var roleDtos = new List<GetRoleDto>();
+
+        foreach (var res in results)
+        {
+            GetRoleDto roleAdded = new()
+            {
+                Id = res.Id,
+                RoleName = res.RoleName,
+                RoleDescription = res.RoleDescription
+            };
+
+            roleDtos.Add(roleAdded);
+        }
+        response.Data = roleDtos;
+        return response;
+    }
+
+    public async Task<ServiceResponse<string>> GenerateLoginVerification(string email)
+    {
+        var response = new ServiceResponse<string>();
+        var getByEmail = await _context.Owners.FirstOrDefaultAsync(s => s.Email == email);
+        if (getByEmail is not null)
+        {
+            var secret = Helpers.RandomString(45);
+            getByEmail.SecretKey = secret;
+            await _context.SaveChangesAsync();
+            response.Data = secret;
+        }
+        else
+        {
+            response.Success = false;
+        }
+
+        return response;
+    }
+
+    public async Task<ServiceResponse<VerifySecretKeyDto>> FromEmailLoginVerification(string secretKey)
+    {
+        var response = new ServiceResponse<VerifySecretKeyDto>();
+        var getBySecretKey = await _context.Owners.FirstOrDefaultAsync(s => s.SecretKey == secretKey);
+
+        if (getBySecretKey is not null)
+        {
+
+            getBySecretKey.SecretKey = "";
+            await _context.SaveChangesAsync();
+            response.Data = new VerifySecretKeyDto
+            {
+                Email = getBySecretKey.Email,
+                Verified = true
+            };
+        }
+        else
+        {
+            response.Success = false;
+        }
+        return response;
     }
 }
