@@ -1,10 +1,13 @@
 using asp_bpm_core7_BE.Dtos.OrganizationDtos;
 using asp_bpm_core7_BE.Models;
 using asp_bpm_core7_BE.Services.OrganizationService;
+using asp_bpm_core7_BE.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace asp_bpm_core7_BE.Controllers;
 
+[Authorize(Roles = Helpers.OwnerRole)]
 [ApiController]
 [Route("api/[controller]")]
 public class OrganizationApiController : ControllerBase

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace asp_bpm_core7_BE.Controllers;
 
-[Authorize(Roles = Helpers.OwnerAdminRole)]
+[Authorize(Roles = Helpers.OwnerRole)]
 [ApiController]
 [Route("api/[controller]")]
 public class OwnerApiController : ControllerBase
