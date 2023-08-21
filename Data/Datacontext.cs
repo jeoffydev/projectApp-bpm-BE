@@ -14,6 +14,7 @@ public class Datacontext : DbContext
 
     public DbSet<Owner> Owners => Set<Owner>();
     public DbSet<AuthRole> AuthRoles => Set<AuthRole>();
+    public DbSet<Organization> Organizations => Set<Organization>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
