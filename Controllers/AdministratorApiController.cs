@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using asp_bpm_core7_BE.Dtos;
 using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 using asp_bpm_core7_BE.Models;
 using asp_bpm_core7_BE.Services.AdministratorService;
 using asp_bpm_core7_BE.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace asp_bpm_core7_BE.Controllers;
@@ -81,5 +83,41 @@ public class AdministratorApiController : ControllerBase
     {
         var response = await _administrator.DeleteAdministrator(id);
         return Ok(response);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("LoginAdministrator")]
+    public async Task<ActionResult<ServiceResponse<AuthAdminResponse>>> LoginAdministrator(LoginAdministratorDto loginUserDto)
+    {
+        var response = await _administrator.LoginAdministrator(
+            loginUserDto.Email,
+            loginUserDto.Password
+        );
+        if (!response.Success)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("CheckLoginEmail")]
+    public async Task<ActionResult<ServiceResponse<string>>> CheckLoginEmail(EmailVerificationDto emailDto)
+    {
+        var response = new ServiceResponse<string>();
+        var verify = await _administrator.AdministratorExists(emailDto.Email);
+        if (!verify)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+        return Ok(await _administrator.GenerateAdministratorLoginVerification(emailDto.Email));
+    }
+
+    [AllowAnonymous]
+    [HttpGet("FinalizedLogin/{secret}")]
+    public async Task<ActionResult<ServiceResponse<VerifySecretKeyDto>>> FinaAdministratorLogin(string secret)
+    {
+        return Ok(await _administrator.AdministratorFromEmailLoginVerification(secret));
     }
 }
