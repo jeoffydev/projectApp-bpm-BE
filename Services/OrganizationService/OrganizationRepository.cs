@@ -1,4 +1,5 @@
 using asp_bpm_core7_BE.Data;
+using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 using asp_bpm_core7_BE.Dtos.OrganizationDtos;
 using asp_bpm_core7_BE.Models;
 using AutoMapper;
@@ -71,6 +72,29 @@ public class OrganizationRepository : IOrganizationRepository
 
 
             var findOrg = await _context.Organizations.FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"Org Id `{id}` is not found");
+
+            var findAdmins = await _context.Administrators.Include(r => r.AuthRole).Where(a => a.OrganizationId == id).AsNoTracking().ToListAsync();
+            var admins = new List<GetAdministratorDto>() { };
+            if (findAdmins is not null)
+            {
+                foreach (var admin in findAdmins)
+                {
+                    GetAdministratorDto adminAdded = new()
+                    {
+                        Id = admin.Id,
+                        Email = admin.Email,
+                        FullName = admin.FullName,
+                        Active = admin.Active,
+                        AuthRoleId = admin.AuthRoleId,
+                        Mobile = admin.Mobile,
+                        Phone = admin.Phone,
+                        RoleName = admin?.AuthRole?.RoleName!,
+                        OrganizationId = findOrg.Id
+                    };
+                    admins.Add(adminAdded);
+                }
+            }
+
             var orgDto = new GetOrgDto
             {
                 Id = findOrg.Id,
@@ -83,6 +107,7 @@ public class OrganizationRepository : IOrganizationRepository
                 MobileNumber = findOrg.MobileNumber,
                 PhoneNumber = findOrg.PhoneNumber,
                 Website = findOrg.Website,
+                GetAdministratorDtos = admins
             };
             response.Data = orgDto;
         }

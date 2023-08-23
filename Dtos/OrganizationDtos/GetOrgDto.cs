@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 
 namespace asp_bpm_core7_BE.Dtos.OrganizationDtos;
 
@@ -21,4 +22,6 @@ public class GetOrgDto
     public string? Website { get; set; }
     [Required]
     public required bool Active { get; set; }
+
+    public List<GetAdministratorDto>? GetAdministratorDtos { get; set; }
 }

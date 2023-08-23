@@ -1,4 +1,5 @@
 using asp_bpm_core7_BE.Data;
+using asp_bpm_core7_BE.Services.AdministratorService;
 using asp_bpm_core7_BE.Services.OrganizationService;
 using asp_bpm_core7_BE.Services.OwnerService;
 using asp_bpm_core7_BE.Utils;
@@ -33,6 +34,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 
 
 // Add Authentication and Authorization nuget - dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer

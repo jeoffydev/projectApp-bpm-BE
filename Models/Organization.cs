@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace asp_bpm_core7_BE.Models;
 
@@ -21,5 +22,8 @@ public class Organization
     public string? Website { get; set; }
     [Required]
     public required bool Active { get; set; }
+
+    [NotMapped]
+    public required List<Administrator> Administrators { get; set; }
 
 }

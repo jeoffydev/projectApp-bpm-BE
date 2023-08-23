@@ -48,6 +48,7 @@ public class OrganizationApiController : ControllerBase
                 MobileNumber = regOrg.MobileNumber,
                 PhoneNumber = regOrg.PhoneNumber,
                 Website = regOrg.Website,
+                Administrators = new() { }
             }
         );
 
