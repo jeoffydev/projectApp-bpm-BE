@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace asp_bpm_core7_BE.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 [ApiController]
 [Route("api/[controller]")]
 public class NullApiController : ControllerBase
