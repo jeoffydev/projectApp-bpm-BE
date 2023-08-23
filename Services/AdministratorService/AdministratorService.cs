@@ -108,8 +108,8 @@ public class AdministratorService : IAdministratorService
         {
 
 
-            var findAdmin = await _context.Administrators.Include(a => a.AuthRole).FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"Owner Id `{id}` is not found");
-            var ownerDto = new GetAdministratorDto
+            var findAdmin = await _context.Administrators.Include(a => a.AuthRole).Include(o => o.Organization).FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"Administrator Id `{id}` is not found");
+            var adminDto = new GetAdministratorDto
             {
                 Id = findAdmin.Id,
                 FullName = findAdmin.FullName,
@@ -118,9 +118,11 @@ public class AdministratorService : IAdministratorService
                 AuthRoleId = findAdmin.AuthRoleId,
                 RoleName = findAdmin?.AuthRole?.RoleName!,
                 Mobile = findAdmin?.Mobile!,
-                Phone = findAdmin?.Phone!
+                Phone = findAdmin?.Phone!,
+                OrganizationId = (int)findAdmin?.OrganizationId!,
+                OrganizationName = findAdmin?.Organization?.CompanyName!
             };
-            response.Data = ownerDto;
+            response.Data = adminDto;
         }
         catch (Exception err)
         {
@@ -161,7 +163,8 @@ public class AdministratorService : IAdministratorService
                 AuthRoleId = dbAdmin.AuthRoleId,
                 RoleName = dbAdmin?.AuthRole?.RoleName!,
                 Mobile = dbAdmin?.Mobile!,
-                Phone = dbAdmin?.Phone!
+                Phone = dbAdmin?.Phone!,
+                OrganizationId = (int)dbAdmin?.OrganizationId!
 
             };
             adminDtos.Add(adminAdded);

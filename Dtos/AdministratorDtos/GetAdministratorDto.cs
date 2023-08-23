@@ -21,4 +21,6 @@ public class GetAdministratorDto
 
     public int OrganizationId { get; set; }
 
+    public string OrganizationName { get; set; } = String.Empty;
+
 }
