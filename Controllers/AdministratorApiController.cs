@@ -121,4 +121,10 @@ public class AdministratorApiController : ControllerBase
     {
         return Ok(await _administrator.AdministratorFromEmailLoginVerification(secret));
     }
+
+    [HttpGet("AdministratorsByOrgId/{id}")]
+    public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> GetAdministratorsByOrgId(int id)
+    {
+        return Ok(await _administrator.GetAllAdministratorsByOrgId(id));
+    }
 }

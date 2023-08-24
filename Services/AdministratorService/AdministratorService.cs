@@ -316,4 +316,42 @@ public class AdministratorService : IAdministratorService
         return tokenHandler.WriteToken(token);
     }
 
+    public async Task<ServiceResponse<List<GetAdministratorDto>>> GetAllAdministratorsByOrgId(int orgId)
+    {
+        var response = new ServiceResponse<List<GetAdministratorDto>>();
+        try
+        {
+            var findAdmins = await _context.Administrators.Include(a => a.AuthRole).Include(o => o.Organization).Where(s => s.OrganizationId == orgId).ToListAsync() ?? throw new Exception($"Org Id `{orgId}` is not found");
+
+            var adminDtos = new List<GetAdministratorDto>();
+
+            foreach (var dbAdmin in findAdmins)
+            {
+                GetAdministratorDto adminAdded = new()
+                {
+                    Id = dbAdmin.Id,
+                    Email = dbAdmin.Email,
+                    FullName = dbAdmin.FullName,
+                    Active = (bool)dbAdmin.Active!,
+                    AuthRoleId = dbAdmin.AuthRoleId,
+                    RoleName = dbAdmin?.AuthRole?.RoleName!,
+                    Mobile = dbAdmin?.Mobile!,
+                    Phone = dbAdmin?.Phone!,
+                    OrganizationId = (int)dbAdmin?.OrganizationId!,
+                    OrganizationName = dbAdmin?.Organization?.CompanyName!
+
+                };
+                adminDtos.Add(adminAdded);
+            }
+            response.Data = adminDtos;
+
+        }
+        catch (Exception err)
+        {
+            response.Success = false;
+            response.Message = err.Message;
+        }
+
+        return response;
+    }
 }
