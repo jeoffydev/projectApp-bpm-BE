@@ -96,6 +96,11 @@ Program.cs - builder.Services.AddAuthentication() and app.UseAuthentication() an
 
 
 # Unit test
+# GitHub link 
+git@github.com:jeoffydev/projectApp-bpm-BE-Unit-Test.git
+
+Demo: https://share.vidyard.com/watch/fuRQcwK1iVQJqgUeMn4xvr?
+
 dotnet add package xunit
 # xunit  and test folder should be outside the root directory of app (asp-bpm-core7-BE)
 dotnet new xunit -o unit-test-bfm
