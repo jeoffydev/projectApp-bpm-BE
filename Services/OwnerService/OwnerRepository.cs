@@ -63,16 +63,9 @@ public class OwnerRepository : IOwnerRepository
 
 
 
-    public async Task<ServiceResponse<GetOwnerDto>> RegisterOwner(Owner owner, string password)
+    public async Task<GetOwnerDto> RegisterOwner(Owner owner, string password)
     {
 
-        var response = new ServiceResponse<GetOwnerDto>();
-        if (await OwnerExists(owner.Email))
-        {
-            response.Success = false;
-            response.Message = "Owner already exists.";
-            return response;
-        }
 
         Helpers.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
         owner.PasswordHash = passwordHash;
@@ -89,9 +82,7 @@ public class OwnerRepository : IOwnerRepository
             Email = owner.Email
         };
 
-        response.Data = resultDto;
-
-        return response;
+        return resultDto;
     }
 
     public async Task<bool> OwnerExists(string email)

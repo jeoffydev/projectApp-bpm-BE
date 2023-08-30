@@ -9,7 +9,7 @@ public interface IOwnerRepository
     Task<ServiceResponse<GetOwnerDto>> GetOwner(int id);
     Task<bool> OwnerExists(string email);
     Task<bool> OwnerExistsById(int id);
-    Task<ServiceResponse<GetOwnerDto>> RegisterOwner(Owner owner, string password);
+    Task<GetOwnerDto> RegisterOwner(Owner owner, string password);
 
     Task<ServiceResponse<int>> DeleteOwner(int id);
 

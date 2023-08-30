@@ -22,7 +22,7 @@ public class OwnerApiController : ControllerBase
     }
 
     [HttpGet("Owners/{roleId?}")]
-    public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> GetOwners(int? roleId)
+    public async Task<ActionResult<ServiceResponse<List<GetOwnerDto>>>> GetOwners(int? roleId)
     {
         return Ok(await _ownerRepository.GetAllOwners(roleId));
     }
@@ -51,7 +51,16 @@ public class OwnerApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<GetOwnerDto>>> RegisterOwner(RegisterOwnerDto registerOwnerDto)
     {
 
-        var response = await _ownerRepository.RegisterOwner(
+        var response = new ServiceResponse<GetOwnerDto>();
+
+        if (await _ownerRepository.OwnerExists(registerOwnerDto.Email))
+        {
+            response.Success = false;
+            response.Message = "Owner already exists.";
+            return BadRequest(response);
+        }
+
+        var ownerResult = await _ownerRepository.RegisterOwner(
             new Owner
             {
                 FullName = registerOwnerDto.FullName,
@@ -62,10 +71,7 @@ public class OwnerApiController : ControllerBase
             registerOwnerDto.Password
         );
 
-        if (!response.Success)
-        {
-            return BadRequest(response);
-        }
+        response.Data = ownerResult;
 
         return Ok(response);
     }

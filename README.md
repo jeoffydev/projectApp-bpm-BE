@@ -97,16 +97,16 @@ Program.cs - builder.Services.AddAuthentication() and app.UseAuthentication() an
 
 # Unit test
 dotnet add package xunit
-# xunit  and test folder should be outside the root directory of app (asp-core7-BE)
-dotnet new xunit -o unit-test-invoicequote
-dotnet add unit-test-invoicequote/unit-test-invoicequote.csproj reference asp-core7-BE/asp-core7-BE.csproj
+# xunit  and test folder should be outside the root directory of app (asp-bpm-core7-BE)
+dotnet new xunit -o unit-test-bfm
+dotnet add unit-test-bfm/unit-test-bfm.csproj reference asp-bpm-core7-BE/asp-bpm-core7-BE.csproj
 
 dotnet add package NUnit
 dotnet add package EntityFrameworkCoreMock.Moq
 
 RUN:
-dotnet test unit-test-invoicequote/unit-test-invoicequote.csproj
-dotnet test unit-test-invoicequote.csproj
+dotnet test unit-test-bfm/unit-test-bfm.csproj
+dotnet test unit-test-bfm.csproj
 
 # Swagger authentication test
 dotnet add package Swashbuckle.AspNetCore.Filters
