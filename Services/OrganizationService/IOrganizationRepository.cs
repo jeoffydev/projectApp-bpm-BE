@@ -8,7 +8,7 @@ public interface IOrganizationRepository
     Task<ServiceResponse<List<GetOrgDto>>> GetAllOrganizations();
     Task<ServiceResponse<GetOrgDto>> GetOrganization(int id);
     Task<bool> OrganizationExistsById(int id);
-    Task<ServiceResponse<GetOrgDto>> RegisterOrganization(Organization organization);
+    Task<GetOrgDto> RegisterOrganization(Organization organization);
 
     Task<ServiceResponse<int>> DeleteOrganization(int id);
 

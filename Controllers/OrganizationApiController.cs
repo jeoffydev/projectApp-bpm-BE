@@ -35,8 +35,9 @@ public class OrganizationApiController : ControllerBase
     [HttpPost("RegisterOrganization")]
     public async Task<ActionResult<ServiceResponse<GetOrgDto>>> RegisterOrganization(RegisterOrgDto regOrg)
     {
+        var response = new ServiceResponse<GetOrgDto>();
 
-        var response = await _organizationRepository.RegisterOrganization(
+        var result = await _organizationRepository.RegisterOrganization(
             new Organization
             {
                 CompanyName = regOrg.CompanyName,
@@ -52,10 +53,8 @@ public class OrganizationApiController : ControllerBase
             }
         );
 
-        if (!response.Success)
-        {
-            return BadRequest(response);
-        }
+        response.Data = result;
+
 
         return Ok(response);
     }

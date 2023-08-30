@@ -131,10 +131,8 @@ public class OrganizationRepository : IOrganizationRepository
         return false;
     }
 
-    public async Task<ServiceResponse<GetOrgDto>> RegisterOrganization(Organization organization)
+    public async Task<GetOrgDto> RegisterOrganization(Organization organization)
     {
-
-        var response = new ServiceResponse<GetOrgDto>();
 
         _context.Organizations.Add(organization);
         await _context.SaveChangesAsync();
@@ -153,9 +151,7 @@ public class OrganizationRepository : IOrganizationRepository
             Website = organization.Website,
         };
 
-        response.Data = resultDto;
-
-        return response;
+        return resultDto;
     }
 
     public async Task<ServiceResponse<GetOrgDto>> UpdateOrganization(UpdateOrgDto updateOrg)
