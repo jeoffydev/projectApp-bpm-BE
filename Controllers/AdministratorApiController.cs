@@ -55,7 +55,7 @@ public class AdministratorApiController : ControllerBase
         {
             response.Success = false;
             response.Message = "Administrator already exists.";
-            return response;
+            return BadRequest(response);
         }
 
         var result = await _administrator.RegisterAdministrator(
