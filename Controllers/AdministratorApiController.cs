@@ -21,7 +21,7 @@ public class AdministratorApiController : ControllerBase
     }
 
     [HttpGet("Administrators/{roleId?}")]
-    public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> GetAdministrators(int? roleId)
+    public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> GetAdministrators(int? roleId)
     {
         return Ok(await _administrator.GetAllAdministrators(roleId));
     }
@@ -49,8 +49,16 @@ public class AdministratorApiController : ControllerBase
     [HttpPost("RegisterAdministrator")]
     public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> RegisterAdministrator(RegisterAdminstratorDto registerAdmin)
     {
+        var response = new ServiceResponse<GetAdministratorDto>();
 
-        var response = await _administrator.RegisterAdministrator(
+        if (await _administrator.AdministratorExists(registerAdmin.Email))
+        {
+            response.Success = false;
+            response.Message = "Administrator already exists.";
+            return response;
+        }
+
+        var result = await _administrator.RegisterAdministrator(
             new Administrator
             {
                 FullName = registerAdmin.FullName,
@@ -63,11 +71,7 @@ public class AdministratorApiController : ControllerBase
             },
             registerAdmin.Password
         );
-
-        if (!response.Success)
-        {
-            return BadRequest(response);
-        }
+        response.Data = result;
 
         return Ok(response);
     }

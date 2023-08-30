@@ -10,7 +10,7 @@ public interface IAdministratorService
     Task<ServiceResponse<GetAdministratorDto>> GetAdministrator(int id);
     Task<bool> AdministratorExists(string email);
     Task<bool> AdministratorExistsById(int id);
-    Task<ServiceResponse<GetAdministratorDto>> RegisterAdministrator(Administrator admin, string password);
+    Task<GetAdministratorDto> RegisterAdministrator(Administrator admin, string password);
 
     Task<ServiceResponse<int>> DeleteAdministrator(int id);
 

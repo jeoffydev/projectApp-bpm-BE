@@ -207,16 +207,8 @@ public class AdministratorService : IAdministratorService
         return response;
     }
 
-    public async Task<ServiceResponse<GetAdministratorDto>> RegisterAdministrator(Administrator admin, string password)
+    public async Task<GetAdministratorDto> RegisterAdministrator(Administrator admin, string password)
     {
-        var response = new ServiceResponse<GetAdministratorDto>();
-        if (await AdministratorExists(admin.Email))
-        {
-            response.Success = false;
-            response.Message = "Administrator already exists.";
-            return response;
-        }
-
         Helpers.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
         admin.PasswordHash = passwordHash;
         admin.PasswordSalt = passwordSalt;
@@ -236,10 +228,7 @@ public class AdministratorService : IAdministratorService
             OrganizationId = admin.OrganizationId,
             Active = admin.Active
         };
-
-        response.Data = resultDto;
-
-        return response;
+        return resultDto;
     }
 
     public async Task<ServiceResponse<GetAdministratorDto>> UpdateAdministrator(UpdateAdministratorDto admin, string password)
