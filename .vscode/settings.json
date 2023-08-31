@@ -1,3 +1,6 @@
 {
-    "dotnet.defaultSolution": "asp-bpm-core7-BE.sln"
+    "dotnet.defaultSolution": "asp-bpm-core7-BE.sln",
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "bin\\Release\\net7.0\\publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/5871b12e-3f75-4b7a-a4a5-05558cca6bb0/resourceGroups/bpmresourcegroup/providers/Microsoft.Web/sites/bpmbackendsoftware"
 }
