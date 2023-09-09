@@ -22,4 +22,6 @@ public interface IAdministratorService
     Task<ServiceResponse<VerifySecretKeyDto>> AdministratorFromEmailLoginVerification(string secretKey);
 
     Task<ServiceResponse<List<GetAdministratorDto>>> GetAllAdministratorsByOrgId(int orgId);
+
+    Task<OrganizationUserResponse<GetAdministratorDto>> GetUserClaimDetails(int id);
 }

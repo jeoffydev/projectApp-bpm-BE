@@ -343,4 +343,33 @@ public class AdministratorService : IAdministratorService
 
         return response;
     }
+
+    public async Task<OrganizationUserResponse<GetAdministratorDto>> GetUserClaimDetails(int id)
+    {
+        var response = new OrganizationUserResponse<GetAdministratorDto>();
+        try
+        {
+            var findAdmin = await _context.Administrators.Include(a => a.AuthRole).Include(o => o.Organization).FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"User Id `{id}` is not found");
+            var userDto = new GetAdministratorDto
+            {
+                Id = findAdmin.Id,
+                FullName = findAdmin.FullName,
+                Email = findAdmin.Email,
+                Active = (bool)findAdmin.Active!,
+                AuthRoleId = findAdmin.AuthRoleId,
+                RoleName = findAdmin?.AuthRole?.RoleName!,
+                Mobile = findAdmin?.Mobile!,
+                Phone = findAdmin?.Phone!,
+                OrganizationId = (int)findAdmin?.OrganizationId!,
+                OrganizationName = findAdmin?.Organization?.CompanyName!
+            };
+            response.Data = userDto;
+        }
+        catch (Exception err)
+        {
+            response.ErrorMsg = err.Message;
+            response.Success = false;
+        }
+        return response;
+    }
 }
