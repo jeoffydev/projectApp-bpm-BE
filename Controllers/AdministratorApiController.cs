@@ -161,4 +161,21 @@ public class AdministratorApiController : ControllerBase
         var update = await _administrator.UpdateAdministratorByClaims(updateUser, getUser.UserId);
         return Ok(update);
     }
+
+    [Authorize(Roles = Helpers.AdminRole)]
+    [HttpPut("UpdateUserPasswordByClaims")]
+    public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> UpdateUserPasswordByClaims(UpdateUserPasswordDto userDto)
+    {
+        var response = new ServiceResponse<bool>();
+        var getUser = UserClaims.UserClaimOrganization(_httpContextAccessor);
+        if (getUser.UserId == 0)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+
+        var update = await _administrator.UpdateAdministratorPasswordByClaims(userDto.Password, getUser.UserId);
+        return Ok(update);
+    }
 }
