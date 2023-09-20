@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using asp_bpm_core7_BE.Data;
 using asp_bpm_core7_BE.Dtos;
 using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 using asp_bpm_core7_BE.Models;
@@ -15,9 +16,11 @@ namespace asp_bpm_core7_BE.Controllers;
 public class AdministratorApiController : ControllerBase
 {
     private readonly IAdministratorService _administrator;
-    public AdministratorApiController(IAdministratorService administratorService)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public AdministratorApiController(IAdministratorService administratorService, IHttpContextAccessor httpContextAccessor)
     {
         _administrator = administratorService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [Authorize(Roles = Helpers.OwnerRole)]
@@ -41,9 +44,8 @@ public class AdministratorApiController : ControllerBase
         var response = new ServiceResponse<GetAdministratorDto>();
         if (User.IsInRole(Helpers.AdminRole))
         {
-            var getUserId = User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.NameIdentifier)!.Value;
-            int userId = Int32.Parse(getUserId);
-            return Ok(await _administrator.GetAdministrator(userId));
+            var getUser = UserClaims.UserClaimOrganization(_httpContextAccessor);
+            return Ok(await _administrator.GetAdministrator(getUser.UserId));
         }
         return response;
 
@@ -145,19 +147,18 @@ public class AdministratorApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> UpdateUserDetailsByClaims(UpdateDetailsUserDto userDto)
     {
         var response = new ServiceResponse<bool>();
-        var getUserId = User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.NameIdentifier)!.Value;
-        if (getUserId is null)
+        var getUser = UserClaims.UserClaimOrganization(_httpContextAccessor);
+        if (getUser.UserId == 0)
         {
             response.Success = false;
             return BadRequest(response);
         }
 
-        int userId = Int32.Parse(getUserId);
         UpdateDetailsUserDto updateUser = new UpdateDetailsUserDto()
         {
             FullName = userDto.FullName
         };
-        var update = await _administrator.UpdateAdministratorByClaims(updateUser, userId);
+        var update = await _administrator.UpdateAdministratorByClaims(updateUser, getUser.UserId);
         return Ok(update);
     }
 }

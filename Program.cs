@@ -35,6 +35,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
+builder.Services.AddHttpContextAccessor();
 
 
 // Add Authentication and Authorization nuget - dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer

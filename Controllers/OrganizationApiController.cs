@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using asp_bpm_core7_BE.Data;
 using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 using asp_bpm_core7_BE.Dtos.OrganizationDtos;
 using asp_bpm_core7_BE.Models;
@@ -18,10 +19,13 @@ public class OrganizationApiController : ControllerBase
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IAdministratorService _administrator;
 
-    public OrganizationApiController(IOrganizationRepository organizationRepository, IAdministratorService administratorService)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public OrganizationApiController(IOrganizationRepository organizationRepository, IAdministratorService administratorService, IHttpContextAccessor httpContextAccessor)
     {
         _organizationRepository = organizationRepository;
         _administrator = administratorService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [Authorize(Roles = Helpers.OwnerRole)]
@@ -87,16 +91,15 @@ public class OrganizationApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<GetOrgUserDto>>> GetUserOrganization()
     {
         var response = new ServiceResponse<GetOrgUserDto>();
-        var getUserId = User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.NameIdentifier)!.Value;
-        if (getUserId is null)
+        var getUserId = UserClaims.UserClaimOrganization(_httpContextAccessor);
+        if (getUserId.UserId is 0)
         {
             response.Success = false;
             return BadRequest(response);
         }
 
-        int userId = Int32.Parse(getUserId);
 
-        OrganizationUserResponse<GetAdministratorDto> getUser = await _administrator.GetUserClaimDetails(userId);
+        OrganizationUserResponse<GetAdministratorDto> getUser = await _administrator.GetUserClaimDetails(getUserId.UserId);
         if (getUser.Success && getUser?.Data?.OrganizationId is not null)
         {
             var orgDetails = await _organizationRepository.GetOrganization(getUser.Data.OrganizationId);
