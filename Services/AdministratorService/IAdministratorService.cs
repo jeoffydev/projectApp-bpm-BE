@@ -24,4 +24,7 @@ public interface IAdministratorService
     Task<ServiceResponse<List<GetAdministratorDto>>> GetAllAdministratorsByOrgId(int orgId);
 
     Task<OrganizationUserResponse<GetAdministratorDto>> GetUserClaimDetails(int id);
+
+    Task<ServiceResponse<bool>> UpdateAdministratorByClaims(UpdateDetailsUserDto userDto, int id);
+
 }

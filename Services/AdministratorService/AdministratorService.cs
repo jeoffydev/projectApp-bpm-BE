@@ -372,4 +372,23 @@ public class AdministratorService : IAdministratorService
         }
         return response;
     }
+
+    public async Task<ServiceResponse<bool>> UpdateAdministratorByClaims(UpdateDetailsUserDto userDto, int id)
+    {
+        var response = new ServiceResponse<bool>();
+        try
+        {
+            var getById = await _context.Administrators.FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"User Id `{id}` is not found");
+            getById.FullName = userDto.FullName;
+            await _context.SaveChangesAsync();
+            response.Data = true;
+        }
+        catch (Exception err)
+        {
+            response.Success = false;
+            response.Message = err.Message;
+        }
+
+        return response;
+    }
 }

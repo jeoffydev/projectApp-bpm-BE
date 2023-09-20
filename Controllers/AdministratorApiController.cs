@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace asp_bpm_core7_BE.Controllers;
 
-[Authorize(Roles = Helpers.OwnerRole)]
+
 [ApiController]
 [Route("api/[controller]")]
 public class AdministratorApiController : ControllerBase
@@ -20,18 +20,21 @@ public class AdministratorApiController : ControllerBase
         _administrator = administratorService;
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpGet("Administrators/{roleId?}")]
     public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> GetAdministrators(int? roleId)
     {
         return Ok(await _administrator.GetAllAdministrators(roleId));
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpGet("Administrator/{id}")]
     public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> GetAdministratorById(int id)
     {
         return Ok(await _administrator.GetAdministrator(id));
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpGet("AdministratorUser")]
     public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> GetAdministrator()
     {
@@ -46,6 +49,7 @@ public class AdministratorApiController : ControllerBase
 
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpPost("RegisterAdministrator")]
     public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> RegisterAdministrator(RegisterAdminstratorDto registerAdmin)
     {
@@ -76,6 +80,7 @@ public class AdministratorApiController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpPut("UpdateAdministrator")]
     public async Task<ActionResult<ServiceResponse<GetAdministratorDto>>> UpdateAdministrator(UpdateAdministratorDto updateAdmin)
     {
@@ -83,6 +88,8 @@ public class AdministratorApiController : ControllerBase
         return Ok(response);
     }
 
+
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpDelete("DeleteAdministrator/{id}")]
     public async Task<ActionResult<ServiceResponse<int>>> DeleteAdministrator(int id)
     {
@@ -126,9 +133,31 @@ public class AdministratorApiController : ControllerBase
         return Ok(await _administrator.AdministratorFromEmailLoginVerification(secret));
     }
 
+    [Authorize(Roles = Helpers.OwnerRole)]
     [HttpGet("AdministratorsByOrgId/{id}")]
     public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> GetAdministratorsByOrgId(int id)
     {
         return Ok(await _administrator.GetAllAdministratorsByOrgId(id));
+    }
+
+    [Authorize(Roles = Helpers.AdminRole)]
+    [HttpPut("UpdateUserDetailsByClaims")]
+    public async Task<ActionResult<ServiceResponse<List<GetAdministratorDto>>>> UpdateUserDetailsByClaims(UpdateDetailsUserDto userDto)
+    {
+        var response = new ServiceResponse<bool>();
+        var getUserId = User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.NameIdentifier)!.Value;
+        if (getUserId is null)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        int userId = Int32.Parse(getUserId);
+        UpdateDetailsUserDto updateUser = new UpdateDetailsUserDto()
+        {
+            FullName = userDto.FullName
+        };
+        var update = await _administrator.UpdateAdministratorByClaims(updateUser, userId);
+        return Ok(update);
     }
 }
