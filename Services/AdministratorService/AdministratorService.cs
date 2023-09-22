@@ -32,6 +32,15 @@ public class AdministratorService : IAdministratorService
         return false;
     }
 
+    public async Task<bool> AdministratorExistsTrue(string email)
+    {
+        if (await _context.Administrators.AnyAsync(u => u.Email.ToLower() == email.ToLower() && u.Active == true))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public async Task<bool> AdministratorExistsById(int id)
     {
         var checkOwner = await _context.Administrators.FirstOrDefaultAsync(s => s.Id == id);
@@ -401,6 +410,46 @@ public class AdministratorService : IAdministratorService
             Helpers.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
             getById.PasswordHash = passwordHash;
             getById.PasswordSalt = passwordSalt;
+            await _context.SaveChangesAsync();
+            response.Data = true;
+        }
+        catch (Exception err)
+        {
+            response.Success = false;
+            response.Message = err.Message;
+        }
+
+        return response;
+    }
+
+    public async Task<ServiceResponse<ForgotPasswordVerifyDto>> AdministratorSecretKeyVerification(string secretKey)
+    {
+        var response = new ServiceResponse<ForgotPasswordVerifyDto>();
+        var getBySecretKey = await _context.Administrators.FirstOrDefaultAsync(s => s.SecretKey == secretKey);
+
+        if (getBySecretKey is not null)
+        {
+            response.Data = new ForgotPasswordVerifyDto
+            {
+                Email = getBySecretKey.Email,
+                Verified = true,
+                UserId = getBySecretKey.Id
+            };
+        }
+        else
+        {
+            response.Success = false;
+        }
+        return response;
+    }
+
+    public async Task<ServiceResponse<bool>> RemoveSecretKey(string secretKey, int id)
+    {
+        var response = new ServiceResponse<bool>();
+        try
+        {
+            var getById = await _context.Administrators.FirstOrDefaultAsync(s => s.Id == id) ?? throw new Exception($"User Id `{id}` is not found");
+            getById.SecretKey = "";
             await _context.SaveChangesAsync();
             response.Data = true;
         }

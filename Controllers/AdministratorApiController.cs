@@ -119,7 +119,7 @@ public class AdministratorApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<string>>> CheckLoginEmail(EmailVerificationDto emailDto)
     {
         var response = new ServiceResponse<string>();
-        var verify = await _administrator.AdministratorExists(emailDto.Email);
+        var verify = await _administrator.AdministratorExistsTrue(emailDto.Email);
         if (!verify)
         {
             response.Success = false;
@@ -176,6 +176,33 @@ public class AdministratorApiController : ControllerBase
 
 
         var update = await _administrator.UpdateAdministratorPasswordByClaims(userDto.Password, getUser.UserId);
+        return Ok(update);
+    }
+
+
+    [AllowAnonymous]
+    [HttpGet("ForgotUserPassword/{secret}")]
+    public async Task<ActionResult<ServiceResponse<VerifySecretKeyDto>>> ForgotUserPassword(string secret)
+    {
+        return Ok(await _administrator.AdministratorSecretKeyVerification(secret));
+    }
+
+    [AllowAnonymous]
+    [HttpPut("ForgotUserPasswordSubmit")]
+    public async Task<ActionResult<ServiceResponse<bool>>> ForgotUserPasswordSubmit(ForgotPasswordDto userDto)
+    {
+        var response = new ServiceResponse<bool>();
+
+        var verifySecretKey = await _administrator.AdministratorSecretKeyVerification(userDto.SecretKey);
+        var getUser = await _administrator.GetAdministrator(userDto.UserId);
+        if (!getUser.Success || !verifySecretKey.Success)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        await _administrator.RemoveSecretKey(userDto.SecretKey, userDto.UserId);
+        var update = await _administrator.UpdateAdministratorPasswordByClaims(userDto.Password, userDto.UserId);
         return Ok(update);
     }
 }
