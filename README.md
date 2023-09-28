@@ -78,6 +78,9 @@ dotnet ef database update
 Seeding
 dotnet ef migrations add InitialCreateAdmin
 
+Upgrade ef tool
+dotnet tool update --global dotnet-ef
+
 # Login to Azure App Services for deployment
 
 dotnet add package Microsoft.Extensions.Logging.AzureAppServices

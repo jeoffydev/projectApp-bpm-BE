@@ -2,6 +2,7 @@ using asp_bpm_core7_BE.Data;
 using asp_bpm_core7_BE.Services.AdministratorService;
 using asp_bpm_core7_BE.Services.OrganizationService;
 using asp_bpm_core7_BE.Services.OwnerService;
+using asp_bpm_core7_BE.Services.PropertyService;
 using asp_bpm_core7_BE.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -35,6 +36,7 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddHttpContextAccessor();
 
 
