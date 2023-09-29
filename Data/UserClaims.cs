@@ -1,4 +1,7 @@
 using System.Security.Claims;
+using asp_bpm_core7_BE.Dtos.AdministratorDtos;
+using asp_bpm_core7_BE.Dtos.PropertyDtos;
+using asp_bpm_core7_BE.Services.AdministratorService;
 
 namespace asp_bpm_core7_BE.Data;
 
@@ -20,7 +23,33 @@ public static class UserClaims
             UserId = 0
         };
     }
+    public static async Task<ClaimsIdentityDto<GetAdministratorDto>> GetUserClaimDetails(IHttpContextAccessor httpContextAccessor, IAdministratorService _administratorService)
+    {
+        var response = new ClaimsIdentityDto<GetAdministratorDto>();
+        var getUser = UserClaimOrganization(httpContextAccessor);
+        if (getUser.UserId == 0)
+        {
+            response.Success = false;
+            return response;
+        }
+        var getOrgAdmin = await _administratorService.GetUserClaimDetails(getUser.UserId);
+        if (!getOrgAdmin.Success)
+        {
+            response.Success = false;
+            return response;
+        }
+        else
+        {
+            response.Data = getOrgAdmin.Data;
+            return response;
+        }
+
+
+    }
 }
+
+
+
 
 public class UserClaimDto
 {

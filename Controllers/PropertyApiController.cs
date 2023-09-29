@@ -6,6 +6,7 @@ using asp_bpm_core7_BE.Dtos.PropertyDtos;
 using asp_bpm_core7_BE.Utils;
 using asp_bpm_core7_BE.Data;
 using asp_bpm_core7_BE.Services.AdministratorService;
+using asp_bpm_core7_BE.Dtos.AdministratorDtos;
 
 namespace asp_bpm_core7_BE.Controllers;
 
@@ -33,23 +34,42 @@ public class PropertyApiController : ControllerBase
     public async Task<ActionResult<ServiceResponse<List<GetPropertyDto>>>> GetAllPropertiesByOrgIdClaims()
     {
         var response = new ServiceResponse<List<GetPropertyDto>>();
-        var getUser = UserClaims.UserClaimOrganization(_httpContextAccessor);
-        if (getUser.UserId == 0)
+        var getUser = await UserClaims.GetUserClaimDetails(_httpContextAccessor, _administratorService);
+        if (!getUser.Success)
         {
             response.Success = false;
             return BadRequest(response);
         }
 
-        var getOrgAdmin = await _administratorService.GetUserClaimDetails(getUser.UserId);
-        if (getOrgAdmin.Success)
-        {
-            return Ok(await _propertyService.GetAllPropertiesByOrgId((int)getOrgAdmin?.Data?.OrganizationId!));
-        }
-        else
+        return Ok(await _propertyService.GetAllPropertiesByOrgId((int)getUser?.Data?.OrganizationId!));
+
+    }
+
+
+    [Authorize(Roles = Helpers.AdminRole)]
+    [HttpPost("RegisterPropertyByClaims")]
+    public async Task<ActionResult<ServiceResponse<GetPropertyDto>>> RegisterPropertyByClaims(RegisterPropertyDto registerPropertyDto)
+    {
+        var response = new ServiceResponse<List<GetPropertyDto>>();
+        var getUser = await UserClaims.GetUserClaimDetails(_httpContextAccessor, _administratorService);
+        if (!getUser.Success)
         {
             response.Success = false;
             return BadRequest(response);
         }
+
+        var orgId = (int)getUser?.Data?.OrganizationId!;
+
+        var property = new Property
+        {
+            PropertyName = registerPropertyDto.PropertyName,
+            PropertyDetails = registerPropertyDto.PropertyDetails,
+            Address = registerPropertyDto.Address,
+            PropertyColour = registerPropertyDto.PropertyColour,
+            OrganizationId = orgId
+        };
+
+        return Ok(await _propertyService.RegisterProperty(property));
 
     }
 

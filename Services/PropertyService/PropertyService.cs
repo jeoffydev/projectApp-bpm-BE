@@ -50,9 +50,21 @@ public class PropertyService : IPropertyService
         throw new NotImplementedException();
     }
 
-    public Task<GetPropertyDto> RegisterProperty(Property property)
+    public async Task<GetPropertyDto> RegisterProperty(Property property)
     {
-        throw new NotImplementedException();
+        _context.Properties.Add(property);
+        await _context.SaveChangesAsync();
+        var resultDto = new GetPropertyDto
+        {
+            Id = property.Id,
+            PropertyName = property.PropertyName,
+            PropertyDetails = property.PropertyDetails,
+            Address = property.Address,
+            PropertyColour = property.PropertyColour,
+            OrganizationId = property.OrganizationId
+        };
+
+        return resultDto;
     }
 
     public Task<ServiceResponse<GetPropertyDto>> UpdateProperty(UpdatePropertyDto updatePropertyDto)
