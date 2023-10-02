@@ -67,9 +67,40 @@ public class PropertyService : IPropertyService
         return resultDto;
     }
 
-    public Task<ServiceResponse<GetPropertyDto>> UpdateProperty(UpdatePropertyDto updatePropertyDto)
+    public async Task<ServiceResponse<GetPropertyDto>> UpdateProperty(UpdatePropertyDto updatePropertyDto, int orgId)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<GetPropertyDto>();
+        try
+        {
+            var getById = await _context.Properties.FirstOrDefaultAsync(s => s.Id == updatePropertyDto.Id && s.OrganizationId == orgId) ?? throw new Exception($"Property Id `{updatePropertyDto.Id}` is not found");
+
+            getById.PropertyName = updatePropertyDto.PropertyName;
+            getById.Address = updatePropertyDto.Address;
+            getById.PropertyDetails = updatePropertyDto.PropertyDetails;
+            getById.PropertyColour = updatePropertyDto.PropertyColour;
+            await _context.SaveChangesAsync();
+
+            var resultDto = new GetPropertyDto
+            {
+                Id = orgId,
+                PropertyName = updatePropertyDto.PropertyName,
+                PropertyDetails = updatePropertyDto.PropertyDetails,
+                Address = updatePropertyDto.Address,
+                PropertyColour = updatePropertyDto.PropertyColour,
+                OrganizationId = getById.OrganizationId
+            };
+
+            response.Data = _mapper.Map<GetPropertyDto>(resultDto);
+
+        }
+        catch (Exception err)
+        {
+            response.Success = false;
+            response.Message = err.Message;
+        }
+
+        return response;
+
     }
 
     public Task<ServiceResponse<int>> DeleteProperty(int propertyId)

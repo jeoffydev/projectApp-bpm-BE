@@ -50,7 +50,7 @@ public class PropertyApiController : ControllerBase
     [HttpPost("RegisterPropertyByClaims")]
     public async Task<ActionResult<ServiceResponse<GetPropertyDto>>> RegisterPropertyByClaims(RegisterPropertyDto registerPropertyDto)
     {
-        var response = new ServiceResponse<List<GetPropertyDto>>();
+        var response = new ServiceResponse<GetPropertyDto>();
         var getUser = await UserClaims.GetUserClaimDetails(_httpContextAccessor, _administratorService);
         if (!getUser.Success)
         {
@@ -69,8 +69,39 @@ public class PropertyApiController : ControllerBase
             OrganizationId = orgId
         };
 
-        return Ok(await _propertyService.RegisterProperty(property));
+        var result = await _propertyService.RegisterProperty(property);
+        response.Data = result;
+        return Ok(response);
 
     }
+
+
+    [Authorize(Roles = Helpers.AdminRole)]
+    [HttpPut("UpdatePropertyByClaims")]
+    public async Task<ActionResult<ServiceResponse<GetPropertyDto>>> UpdatePropertyByClaims(UpdatePropertyDto updatePropertyDto)
+    {
+        var response = new ServiceResponse<GetPropertyDto>();
+        var getUser = await UserClaims.GetUserClaimDetails(_httpContextAccessor, _administratorService);
+        if (!getUser.Success)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        var orgId = (int)getUser?.Data?.OrganizationId!;
+        var result = await _propertyService.UpdateProperty(updatePropertyDto, orgId);
+        if (!result.Success)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+
+    }
+
+
+
 
 }

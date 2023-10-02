@@ -12,5 +12,5 @@ public interface IPropertyService
     Task<GetPropertyDto> RegisterProperty(Property property);
     Task<ServiceResponse<int>> DeleteProperty(int propertyId);
 
-    Task<ServiceResponse<GetPropertyDto>> UpdateProperty(UpdatePropertyDto updatePropertyDto);
+    Task<ServiceResponse<GetPropertyDto>> UpdateProperty(UpdatePropertyDto updatePropertyDto, int orgId);
 }
