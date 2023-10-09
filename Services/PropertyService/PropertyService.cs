@@ -40,15 +40,46 @@ public class PropertyService : IPropertyService
         return ServiceResponse;
     }
 
-    public Task<ServiceResponse<GetPropertyDto>> GetProperty(int propertyId)
+    public async Task<ServiceResponse<GetPropertyDto>> GetProperty(int id, int orgId)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<GetPropertyDto>();
+        try
+        {
+
+            var findProp = await _context.Properties.FirstOrDefaultAsync(s => s.Id == id && s.OrganizationId == orgId) ?? throw new Exception($"Property Id `{id}` is not found");
+
+            var propDto = new GetPropertyDto
+            {
+                Id = findProp.Id,
+                PropertyName = findProp.PropertyName,
+                PropertyDetails = findProp.PropertyDetails,
+                Address = findProp.Address,
+                OrganizationId = findProp.OrganizationId,
+                PropertyColour = findProp.PropertyColour,
+            };
+            response.Data = propDto;
+        }
+        catch (Exception err)
+        {
+            response.Success = false;
+            response.Message = err.Message;
+        }
+
+
+        return response;
     }
 
-    public Task<bool> PropertyExistsById(int propertyId)
+    public async Task<bool> PropertyExistsById(int propertyId)
     {
-        throw new NotImplementedException();
+        var checkProp = await _context.Properties.FirstOrDefaultAsync(s => s.Id == propertyId);
+        if (checkProp is not null)
+        {
+            return true;
+        }
+        return false;
     }
+
+
 
     public async Task<GetPropertyDto> RegisterProperty(Property property)
     {
@@ -103,8 +134,30 @@ public class PropertyService : IPropertyService
 
     }
 
-    public Task<ServiceResponse<int>> DeleteProperty(int propertyId)
+    public async Task<ServiceResponse<int>> DeleteProperty(int propertyId, int orgId)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<int>();
+        if (await PropertyExistsByOrgId(propertyId, orgId))
+        {
+            await _context.Properties.Where(u => u.Id == propertyId).ExecuteDeleteAsync();
+            response.Data = propertyId;
+        }
+        else
+        {
+            response.Success = false;
+            response.Message = "Property not found.";
+        }
+
+        return response;
+    }
+
+    public async Task<bool> PropertyExistsByOrgId(int propertyId, int orgId)
+    {
+        var checkProp = await _context.Properties.FirstOrDefaultAsync(s => s.Id == propertyId && s.OrganizationId == orgId);
+        if (checkProp is not null)
+        {
+            return true;
+        }
+        return false;
     }
 }

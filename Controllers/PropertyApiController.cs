@@ -101,6 +101,31 @@ public class PropertyApiController : ControllerBase
 
     }
 
+    [Authorize(Roles = Helpers.AdminRole)]
+    [HttpDelete("DeletePropertyByClaims/{id}")]
+    public async Task<ActionResult<ServiceResponse<int>>> DeletePropertyByClaims(int id)
+    {
+        var response = new ServiceResponse<int>();
+        var getUser = await UserClaims.GetUserClaimDetails(_httpContextAccessor, _administratorService);
+        if (!getUser.Success)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        var orgId = (int)getUser?.Data?.OrganizationId!;
+        var result = await _propertyService.DeleteProperty(id, orgId);
+        if (!result.Success)
+        {
+            response.Success = false;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+
+        return Ok(response);
+    }
+
 
 
 
